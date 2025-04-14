@@ -1,81 +1,81 @@
-name: Publish Windows
+# name: Publish Windows
 
-on:
-    push:
-        tags:
-            - 'v*'
+# on:
+#     push:
+#         tags:
+#             - 'v*'
 
-permissions:
-    contents: write
+# permissions:
+#     contents: write
 
-jobs:
-    build-win:
-        runs-on: windows-latest
+# jobs:
+#     build-win:
+#         runs-on: windows-latest
 
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v4
+#         steps:
+#             - name: Checkout repo
+#               uses: actions/checkout@v4
 
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
+#             - name: Set up Node
+#               uses: actions/setup-node@v4
+#               with:
+#                   node-version: 20
 
-            - name: Check GH_TOKEN against repo
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  $Headers = @{
-                    Authorization = "token $env:GH_TOKEN"
-                    Accept = "application/vnd.github.v3+json"
-                    "User-Agent" = "github-actions"
-                  }
-                  $Response = Invoke-RestMethod -Uri "https://api.github.com/repos/rustytsuki/selfupdate/releases" -Headers $Headers -ErrorAction SilentlyContinue
-                  $Status = $?
-                  if (-not $Status) {
-                    Write-Error "❌ GH_TOKEN can not releases API。"
-                  } else {
-                    Write-Output "✅ GH_TOKEN can access Release count: $($Response.Count)"
-                  }
+#             - name: Check GH_TOKEN against repo
+#               env:
+#                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#               run: |
+#                   $Headers = @{
+#                     Authorization = "token $env:GH_TOKEN"
+#                     Accept = "application/vnd.github.v3+json"
+#                     "User-Agent" = "github-actions"
+#                   }
+#                   $Response = Invoke-RestMethod -Uri "https://api.github.com/repos/rustytsuki/selfupdate/releases" -Headers $Headers -ErrorAction SilentlyContinue
+#                   $Status = $?
+#                   if (-not $Status) {
+#                     Write-Error "❌ GH_TOKEN can not releases API。"
+#                   } else {
+#                     Write-Output "✅ GH_TOKEN can access Release count: $($Response.Count)"
+#                   }
 
-            - name: Install dependencies
-              run: |
-                  npm ci
+#             - name: Install dependencies
+#               run: |
+#                   npm ci
 
-            - name: Extract tag version
-              id: extract_version
-              run: |
-                  $tagName = "$env:GITHUB_REF" -replace '^refs/tags/', ''
-                  echo "TAG_NAME=$tagName" >> $env:GITHUB_ENV
+#             - name: Extract tag version
+#               id: extract_version
+#               run: |
+#                   $tagName = "$env:GITHUB_REF" -replace '^refs/tags/', ''
+#                   echo "TAG_NAME=$tagName" >> $env:GITHUB_ENV
 
-                  $version = $tagName -replace '^v', ''
-                  $parts = $version -split '\.'
+#                   $version = $tagName -replace '^v', ''
+#                   $parts = $version -split '\.'
 
-                  if ($parts.Length -lt 3) {
-                  throw "Invalid version format: $version"
-                  }
+#                   if ($parts.Length -lt 3) {
+#                   throw "Invalid version format: $version"
+#                   }
 
-                  $major = $parts[0]
-                  $minor = $parts[1]
-                  $patch = $parts[2]
+#                   $major = $parts[0]
+#                   $minor = $parts[1]
+#                   $patch = $parts[2]
 
-                  echo "VERSION_MAJOR=$major" >> $env:GITHUB_ENV
-                  echo "VERSION_MINOR=$minor" >> $env:GITHUB_ENV
-                  echo "VERSION_PATCH=$patch" >> $env:GITHUB_ENV
+#                   echo "VERSION_MAJOR=$major" >> $env:GITHUB_ENV
+#                   echo "VERSION_MINOR=$minor" >> $env:GITHUB_ENV
+#                   echo "VERSION_PATCH=$patch" >> $env:GITHUB_ENV
 
-                  $versionJs = @"
-                    exports.ver_major = '$major';
-                    exports.ver_minor = '$minor';
-                    exports.ver_patch = '$patch';
-                  "@
+#                   $versionJs = @"
+#                     exports.ver_major = '$major';
+#                     exports.ver_minor = '$minor';
+#                     exports.ver_patch = '$patch';
+#                   "@
 
-                  Set-Content -Path "src/version.js" -Value $versionJs -Encoding UTF8
-                  Write-Output "✅ version.js generated in src/"
-                  Get-Content "src/version.js"
+#                   Set-Content -Path "src/version.js" -Value $versionJs -Encoding UTF8
+#                   Write-Output "✅ version.js generated in src/"
+#                   Get-Content "src/version.js"
 
-            - name: Run publish script for Windows
-              working-directory: ./
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  npm run publish:win
+#             - name: Run publish script for Windows
+#               working-directory: ./
+#               env:
+#                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#               run: |
+#                   npm run publish:win
