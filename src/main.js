@@ -3,6 +3,8 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow } = require('electron');
 const path = require('node:path');
+const { autoUpdater } = require('electron-updater');
+const { platform, arch } = process;
 
 app.commandLine.appendSwitch('enable-logging');
 
@@ -24,6 +26,13 @@ const createWindow = () => {
     // mainWindow.webContents.openDevTools()
 };
 
+autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'rustytsuki',
+    repo: 'selfupdate',
+    channel: 'latest-${platform}-${arch}',
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -35,6 +44,10 @@ app.whenReady().then(() => {
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
+
+    setTimeout(() => {
+        autoUpdater.checkForUpdatesAndNotify();
+    }, 5000);
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

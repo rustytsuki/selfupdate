@@ -16,5 +16,8 @@
         "electron": "^22.3.27",
         "electron-builder": "^26.0.12",
         "fs-extra": "^11.2.0"
+    },
+    "dependencies": {
+        "electron-updater": "^6.6.2"
     }
 }
