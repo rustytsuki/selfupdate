@@ -35,14 +35,10 @@ jobs:
                   throw "Invalid version format: $version"
                   }
 
-                  echo "VERSION_MAJOR=$($parts[0])" >> $env:GITHUB_ENV
-                  echo "VERSION_MINOR=$($parts[1])" >> $env:GITHUB_ENV
-                  echo "VERSION_PATCH=$($parts[2])" >> $env:GITHUB_ENV
-
                   $versionJs = @"
-                    exports.ver_major = '$major';
-                    exports.ver_minor = '$minor';
-                    exports.ver_patch = '$patch';
+                    exports.ver_major = '$parts[0]';
+                    exports.ver_minor = '$parts[1]';
+                    exports.ver_patch = '$parts[2]';
                   "@
 
                   Set-Content -Path "src/version.js" -Value $versionJs -Encoding UTF8
