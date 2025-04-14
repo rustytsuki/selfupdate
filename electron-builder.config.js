@@ -60,11 +60,9 @@ const config = {
     npmRebuild: false,
     publish: {
         provider: 'github',
-        host: 'github.com',
         owner: 'rustytsuki',
         repo: 'selfupdate',
         private: false,
-        protocol: 'https',
         publishAutoUpdate: true,
         releaseType: 'release',
         vPrefixedTagName: true,
