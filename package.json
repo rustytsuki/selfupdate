@@ -5,8 +5,8 @@
     "main": "src/main.js",
     "scripts": {
         "dev": "electron .",
-        "pack:win": "electron-builder --win --x64 --config electron-builder.config.js",
-        "publish:win": "electron-builder --win --x64  --publish always --config electron-builder.config.js"
+        "pack:win": "cross-env DEBUG=electron-builder electron-builder --win --x64 --config electron-builder.config.js",
+        "publish:win": "cross-env DEBUG=electron-builder electron-builder --win --x64  --publish always --config electron-builder.config.js"
     },
     "author": "",
     "license": "ISC",
