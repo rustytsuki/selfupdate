@@ -22,6 +22,8 @@ jobs:
                   node-version: 20
 
             - name: Check GH_TOKEN against repo
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   $Headers = @{
                     Authorization = "token $env:GH_TOKEN"
