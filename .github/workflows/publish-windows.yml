@@ -47,6 +47,7 @@ jobs:
 
                   Set-Content -Path "src/version.js" -Value $versionJs -Encoding UTF8
                   Write-Output "✅ version.js generated in src/"
+                  Get-Content "src/version.js"
 
             - name: Run publish script for Windows
               working-directory: ./
