@@ -21,6 +21,21 @@ jobs:
               with:
                   node-version: 20
 
+            - name: Check GH_TOKEN against repo
+              run: |
+                  $Headers = @{
+                    Authorization = "token $env:GH_TOKEN"
+                    Accept = "application/vnd.github.v3+json"
+                    "User-Agent" = "github-actions"
+                  }
+                  $Response = Invoke-RestMethod -Uri "https://api.github.com/repos/rustytsuki/selfupdate/releases" -Headers $Headers -ErrorAction SilentlyContinue
+                  $Status = $?
+                  if (-not $Status) {
+                    Write-Error "❌ GH_TOKEN can not releases API。"
+                  } else {
+                    Write-Output "✅ GH_TOKEN can access Release count: $($Response.Count)"
+                  }
+
             - name: Install dependencies
               run: |
                   npm ci
