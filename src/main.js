@@ -4,6 +4,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('node:path');
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 const { platform, arch } = process;
 
 app.commandLine.appendSwitch('enable-logging');
@@ -26,12 +27,31 @@ const createWindow = () => {
     // mainWindow.webContents.openDevTools()
 };
 
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+
 autoUpdater.setFeedURL({
     provider: 'github',
     owner: 'rustytsuki',
     repo: 'selfupdate',
-    channel: 'latest-${platform}-${arch}',
+    channel: `latest-${platform}-${arch}`,
 });
+
+autoUpdater.on('checking-for-update', () => {
+    console.log('🔍 正在检查更新...');
+  });
+  
+  autoUpdater.on('update-available', (info) => {
+    console.log('📦 检测到更新！版本：', info.version);
+  });
+  
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('✅ 当前已是最新版');
+  });
+  
+  autoUpdater.on('error', (err) => {
+    console.error('❌ 检查更新出错：', err);
+  });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -45,9 +65,8 @@ app.whenReady().then(() => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
 
-    setTimeout(() => {
-        autoUpdater.checkForUpdatesAndNotify();
-    }, 5000);
+    console.log('🔍 checking update...');
+    autoUpdater.checkForUpdates();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
