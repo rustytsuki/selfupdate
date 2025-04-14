@@ -1,0 +1,56 @@
+name: Publish Windows
+
+on:
+    push:
+        tags:
+            - 'v*'
+
+jobs:
+    build-win:
+        runs-on: windows-latest
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+
+            - name: Install dependencies
+              run: |
+                  npm ci
+
+            - name: Extract tag version
+              id: extract_version
+              run: |
+                  $tagName = "$env:GITHUB_REF" -replace '^refs/tags/', ''
+                  echo "TAG_NAME=$tagName" >> $env:GITHUB_ENV
+
+                  $version = $tagName -replace '^v', ''
+                  $parts = $version -split '\.'
+
+                  if ($parts.Length -lt 3) {
+                  throw "Invalid version format: $version"
+                  }
+
+                  echo "VERSION_MAJOR=$($parts[0])" >> $env:GITHUB_ENV
+                  echo "VERSION_MINOR=$($parts[1])" >> $env:GITHUB_ENV
+                  echo "VERSION_PATCH=$($parts[2])" >> $env:GITHUB_ENV
+
+                  $versionJs = @"
+                    exports.ver_major = '$major';
+                    exports.ver_minor = '$minor';
+                    exports.ver_patch = '$patch';
+                  "@
+
+                  Set-Content -Path "src/version.js" -Value $versionJs -Encoding UTF8
+                  Write-Output "✅ version.js generated in src/"
+
+            - name: Run publish script for Windows
+              working-directory: ./
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  npm run publish:win
