@@ -64,14 +64,13 @@ jobs:
                   echo "VERSION_MINOR=$($parts[1])" >> $env:GITHUB_ENV
                   echo "VERSION_PATCH=$($parts[2])" >> $env:GITHUB_ENV
 
-            - name: Run publish script for Windows
-              working-directory: ./deploy
+            - name: Run build
+              working-directory: ./hello-rust
               env:
                   GH_TOKEN: ${{ secrets.RELEASE }}
                   VERSION_MAJOR: ${{ env.VERSION_MAJOR }}
                   VERSION_MINOR: ${{ env.VERSION_MINOR }}
                   VERSION_PATCH: ${{ env.VERSION_PATCH }}
               run: |
-                  cd hello-rust
                   cargo build --release --target x86_64-pc-windows-msvc
                   cargo build --release --target aarch64-pc-windows-msvc
