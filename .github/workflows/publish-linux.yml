@@ -28,6 +28,32 @@ jobs:
               with:
                   ref: ${{ github.event.inputs.tag }}
 
+            - name: Set up multiarch and sources.list
+              run: |
+                  sudo dpkg --add-architecture arm64
+
+                  # append ports.ubuntu.com source (ARM64)
+                  sudo tee -a /etc/apt/sources.list > /dev/null <<EOF
+                  deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main universe multiverse restricted
+                  deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main universe multiverse restricted
+                  deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main universe multiverse restricted
+                  EOF
+
+                  # Optional, make arm64 lower priority
+                  sudo tee /etc/apt/preferences.d/multiarch > /dev/null <<EOF
+                  Package: *
+                  Pin: architecture amd64
+                  Pin-Priority: 900
+
+                  Package: *
+                  Pin: architecture arm64
+                  Pin-Priority: 400
+                  EOF
+
+                  set +e
+                  sudo apt update
+                  set -e
+
             - name: Install toolchain and ARM64 dependencies
               run: |
                   sudo apt install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
