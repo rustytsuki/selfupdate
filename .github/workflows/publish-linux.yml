@@ -56,7 +56,7 @@ jobs:
                   echo "VERSION_PATCH=$PATCH" >> "$GITHUB_ENV"
 
             - name: Run publish script for Linux
-              working-directory: ./deploy
+              working-directory: ./hello-rust
               env:
                   GH_TOKEN: ${{ secrets.RELEASE }}
                   VERSION_MAJOR: ${{ env.VERSION_MAJOR }}
