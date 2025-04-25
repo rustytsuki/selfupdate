@@ -55,7 +55,18 @@ jobs:
                   echo "VERSION_MINOR=$MINOR" >> "$GITHUB_ENV"
                   echo "VERSION_PATCH=$PATCH" >> "$GITHUB_ENV"
 
-            - name: Run publish script for Linux
+            - name: Run publish script for Linux(arm64)
+              working-directory: ./hello-rust
+              env:
+                  GH_TOKEN: ${{ secrets.RELEASE }}
+                  VERSION_MAJOR: ${{ env.VERSION_MAJOR }}
+                  VERSION_MINOR: ${{ env.VERSION_MINOR }}
+                  VERSION_PATCH: ${{ env.VERSION_PATCH }}
+                  CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+              run: |
+                  cargo build --release --target aarch64-unknown-linux-gnu
+
+            - name: Run publish script for Linux(x64)
               working-directory: ./hello-rust
               env:
                   GH_TOKEN: ${{ secrets.RELEASE }}
@@ -63,5 +74,4 @@ jobs:
                   VERSION_MINOR: ${{ env.VERSION_MINOR }}
                   VERSION_PATCH: ${{ env.VERSION_PATCH }}
               run: |
-                  cargo build --release --target aarch64-unknown-linux-gnu
                   cargo build --release --target x86_64-unknown-linux-gnu
