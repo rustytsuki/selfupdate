@@ -32,10 +32,16 @@ jobs:
               run: |
                   sudo dpkg --add-architecture arm64
 
-                  # append ports.ubuntu.com source (ARM64)
-                  sudo tee -a /etc/apt/sources.list > /dev/null <<EOF
+                  # clear default sources.list
+                  sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+                  sudo sed -i 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list
+
+                  # add arm64 source, only use ports.ubuntu.com
+                  sudo tee -a /etc/apt/sources.list.d/arm64.list > /dev/null <<EOF
                   deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main universe multiverse restricted
                   deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main universe multiverse restricted
+                  deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main universe multiverse restricted
+                  deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-backports main universe multiverse restricted
                   EOF
 
                   sudo apt update
