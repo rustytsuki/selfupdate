@@ -38,24 +38,12 @@ jobs:
                   deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main universe multiverse restricted
                   EOF
 
-                  # Optional, make arm64 lower priority
-                  sudo tee /etc/apt/preferences.d/multiarch > /dev/null <<EOF
-                  Package: *
-                  Pin: architecture amd64
-                  Pin-Priority: 900
-
-                  Package: *
-                  Pin: architecture arm64
-                  Pin-Priority: 400
-                  EOF
-
-                  set +e
                   sudo apt update
-                  set -e
 
             - name: Install toolchain and ARM64 dependencies
               run: |
                   sudo apt install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+                  sudo apt install -y libxml2:arm64
                   sudo apt install -y libgl1:arm64 libglx-mesa0:arm64
 
             - name: Install Rust toolchain
